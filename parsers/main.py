@@ -1,24 +1,32 @@
 from parsers.source import *
 
-# Прокси
-
 
 def Main() -> None:
     sheet_id = ExtractSheetId(GetSector('B6', 'B6', SERVICE, 'Сервисы', SHEET_ID)[0][0])
-    row = 2
-    barcodes = GetSector('A2', 'A1000', SERVICE, 'Настройки', sheet_id)
-    words = GetSector('B2', 'B1000', SERVICE, 'Настройки', sheet_id)
+    row = len(GetSector('A2', 'A1000', SERVICE, 'Данные', sheet_id)) + 2
+    barcodes = [item[0] for item in GetSector('A2', 'A1000', SERVICE, 'Настройки', sheet_id)]
+    words = [item[0] for item in GetSector('B2', 'B1000', SERVICE, 'Настройки', sheet_id)]
+    proxies = GetProxies()
     for word in words:
         Stamp(f'Processing template: {word}', 'i')
         data = []
         for page in range(1, PAGES_QUANTITY + 1):
             Stamp(f'Processing page {page}', 'i')
-            raw = GetAndCheck(page, word, proxies)
-            advertise, real = ProcessData(raw, word, page)
-            data += FilterByBarcode(real, barcodes)
+            raw = GetAndCheck(page, word, choice(proxies))
+            raw = ProcessData(raw, word, page)
+            data += FilterByBarcode(raw, barcodes)
             AccurateSleep(SHORT_SLEEP, 0.5)
-        UploadData(advertise_pages, heading, sheet_id, service, row)
+        UploadData(data, 'Данные', sheet_id, SERVICE, row)
         row += len(data)
+
+
+def GetProxies() -> list[dict]:
+    raw = GetSector('A2', 'D6', SERVICE, 'Прокси', SHEET_ID)
+    res = []
+    for proxy in raw:
+        res.append({'http': f'http://{proxy[0]}:{proxy[1]}@{proxy[2]}:{proxy[3]}',
+                    'https': f'http://{proxy[0]}:{proxy[1]}@{proxy[2]}:{proxy[3]}'})
+    return res
 
 
 def GetAndCheck(page: int, word: str, proxies: dict = None) -> dict:
@@ -40,16 +48,6 @@ def GetAndCheck(page: int, word: str, proxies: dict = None) -> dict:
     return raw
 
 
-def ParseCurrentHeading(config: ConfigParser, heading: str) -> (str, str, dict):
-    column = config[heading]['Column']
-    sheet_id = config['DEFAULT']['SheetID' + TYPE]
-    proxies = {
-        'http': f'http://{config['DEFAULT']['Login']}:{config['DEFAULT']['Password']}@{config['DEFAULT']['IP/Port']}',
-        'https': f'http://{config['DEFAULT']['Login']}:{config['DEFAULT']['Password']}@{config['DEFAULT']['IP/Port']}'
-    }
-    return column, sheet_id, proxies
-
-
 def FilterByBarcode(list_for_filter: list, barcodes: list) -> list:
     filtered_list = []
     for sublist in list_for_filter:
@@ -66,7 +64,6 @@ def GetData(page: int, word: str, proxy: dict) -> dict:
     HEADERS['User-Agent'] = choice(USER_AGENTS)
     HEADERS['Referer'] = HEADERS['Referer'].format(quote(word))
     try:
-        Stamp('Using proxy', 'i')
         response = get(URL, params=PARAMS, headers=HEADERS, proxies=proxy)
     except ConnectionError:
         Stamp(f'Connection on {URL}', 'e')
@@ -106,7 +103,7 @@ def ProcessData(raw: dict, word: str, page: int) -> (list, list):
                 case 'time':
                     row.append(str(datetime.now().strftime('%Y-%m-%d %H:%M')))
                 case 'price':
-                    row.append(str(int(raw['data']['products'][i]['sizes'][0]['price']['product']) / 100))
+                    row.append(str(round(int(raw['data']['products'][i]['sizes'][0]['price']['product']) / 100)))
         data.append(row)
     return data
 
