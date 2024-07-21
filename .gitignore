@@ -1,0 +1,9 @@
+keys.json
+config.ini
+**/__pycache__/
+.idea
+__pycache__/
+venv
+LOG/*
+test.py
+secret.py
