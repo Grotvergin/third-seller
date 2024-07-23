@@ -4,17 +4,17 @@ from stock.source import *
 def Main():
     sheet_id, token = GetSector('B7', 'C7', SERVICE, 'Сервисы', SHEET_ID)[0]
     warehouses = GetData(URL_WAREHOUSES, token)
-    nmids = GetData(URL_NMIDS, token, {'limit': 1000})
-    data = ProcessData(warehouses, nmids, token)
+    barcodes = GetData(URL_BARCODES, token, {'dateFrom': '2019-06-20'})
+    data = ProcessData(warehouses, barcodes, token)
     CleanSheet(len(COLUMNS), 'Данные', ExtractSheetId(sheet_id), SERVICE)
     UploadData(data, 'Данные', ExtractSheetId(sheet_id), SERVICE)
 
 
-def ProcessData(warehouses: list, nmids: dict, token: str) -> list:
-    nmids = [str(item['nmID']) for item in nmids['data']['listGoods']]
+def ProcessData(warehouses: list, barcodes: dict, token: str) -> list:
+    barcodes = [str(item['barcode']) for item in barcodes]
     list_of_rows = []
     for warehouse in warehouses:
-        data = GetData(URL_STOCKS.format(warehouse['id']), token, body={'skus': nmids})
+        data = GetData(URL_STOCKS.format(warehouse['id']), token, body={'skus': barcodes})
         for stock in data['stocks']:
             one_row = []
             for column in COLUMNS:
@@ -51,6 +51,7 @@ def GetData(url: str, token: str, params: dict = None, body: dict = None) -> dic
             Sleep(LONG_SLEEP)
             raw = GetData(url, token, body)
     return raw
+
 
 if __name__ == '__main__':
     Main()

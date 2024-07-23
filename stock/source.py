@@ -2,7 +2,7 @@ from __init__ import *
 from secret import *
 
 URL_WAREHOUSES = 'https://suppliers-api.wildberries.ru/api/v3/warehouses'
-URL_NMIDS = 'https://discounts-prices-api.wildberries.ru/api/v2/list/goods/filter'
+URL_BARCODES = 'https://statistics-api.wildberries.ru/api/v1/supplier/stocks'
 URL_STOCKS = 'https://suppliers-api.wildberries.ru/api/v3/stocks/{}'
 LONG_SLEEP = 60
 SHORT_SLEEP = 20
