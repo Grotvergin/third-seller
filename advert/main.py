@@ -19,7 +19,25 @@ def PrepareCampaigns(token: str) -> dict:
     for i in range(SmartLen(raw['adverts'])):
         for j in range(SmartLen(raw['adverts'][i]['advert_list'])):
             dict_of_campaigns[raw['adverts'][i]['advert_list'][j]['advertId']] = raw['adverts'][i]['type']
-    return dict_of_campaigns
+    dates = []
+    for i in range(0, SmartLen(list(dict_of_campaigns.keys())), PORTION):
+        Stamp(f'PREPARING {PORTION} campaigns from {i} out of {SmartLen(list(dict_of_campaigns.keys()))}', 'i')
+        portion_of_campaigns = list(list(dict_of_campaigns.keys()))[i:i + PORTION]
+        dates += GetData(URL_DATE, token, portion_of_campaigns)
+        Stamp(f'Now data length is {SmartLen(dates)}', 'i')
+        Sleep(SLEEP)
+    res_dict_for_dates = {}
+    for key, value in dict_of_campaigns.items():
+        for item in dates:
+            start_time = datetime.strptime(item['startTime'].rsplit('+', 1)[0], "%Y-%m-%dT%H:%M:%S.%f")
+            try:
+                end_time = datetime.strptime(item['endTime'].rsplit('+', 1)[0], "%Y-%m-%dT%H:%M:%S.%f")
+            except ValueError:
+                end_time = datetime.strptime(item['endTime'].rsplit('+', 1)[0], "%Y-%m-%dT%H:%M:%S")
+            req_time = datetime.strptime(DATE, '%Y-%m-%d')
+            if key == item['advertId'] and start_time < req_time < end_time:
+                res_dict_for_dates[key] = value
+    return res_dict_for_dates
 
 
 @ControlRecursion
@@ -55,7 +73,7 @@ def ProcessData(raw: dict, sheet_name: str, token: str, sheet_id: str, service: 
     for i in range(0, SmartLen(raw), PORTION):
         Stamp(f'Processing {PORTION} campaigns from {i} out of {SmartLen(raw)}', 'i')
         portion_of_campaigns = list(raw.keys())[i:i + PORTION]
-        list_for_request = [{'id': campaign, 'interval': {'begin': BEGIN, 'end': BEGIN}} for campaign in portion_of_campaigns]
+        list_for_request = [{'id': campaign, 'interval': {'begin': DATE, 'end': DATE}} for campaign in portion_of_campaigns]
         data = GetData(URL_STAT, token, list_for_request)
         list_of_all = []
         for t in range(SmartLen(data)):

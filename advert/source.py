@@ -1,11 +1,12 @@
 from __init__ import *
 from secret import *
 
-URL_CAMPAIGNS = 'https://advert-api.wb.ru/adv/v1/promotion/count'
-URL_STAT = 'https://advert-api.wb.ru/adv/v2/fullstats'
+URL_CAMPAIGNS = 'https://advert-api.wildberries.ru/adv/v1/promotion/count'
+URL_STAT = 'https://advert-api.wildberries.ru/adv/v2/fullstats'
+URL_DATE = 'https://advert-api.wildberries.ru/adv/v1/promotion/adverts'
 SLEEP = 60
 PORTION = 50
-BEGIN = (datetime.now() - timedelta(days=1)).strftime('%Y-%m-%d')
+DATE = (datetime.now() - timedelta(days=1)).strftime('%Y-%m-%d')
 SECTOR = ('B3', 'C3')
 TYPES_AND_NAMES = {
     4: 'в каталоге',
