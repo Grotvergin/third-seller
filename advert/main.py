@@ -29,13 +29,10 @@ def PrepareCampaigns(token: str) -> dict:
     res_dict_for_dates = {}
     for key, value in dict_of_campaigns.items():
         for item in dates:
-            start_time = datetime.strptime(item['startTime'].rsplit('+', 1)[0], "%Y-%m-%dT%H:%M:%S.%f")
-            try:
-                end_time = datetime.strptime(item['endTime'].rsplit('+', 1)[0], "%Y-%m-%dT%H:%M:%S.%f")
-            except ValueError:
-                end_time = datetime.strptime(item['endTime'].rsplit('+', 1)[0], "%Y-%m-%dT%H:%M:%S")
+            start_time = datetime.strptime(item['startTime'].rsplit('T', 1)[0], "%Y-%m-%d")
+            end_time = datetime.strptime(item['endTime'].rsplit('T', 1)[0], "%Y-%m-%d")
             req_time = datetime.strptime(DATE, '%Y-%m-%d')
-            if key == item['advertId'] and start_time < req_time < end_time:
+            if key == item['advertId'] and start_time <= req_time <= end_time:
                 res_dict_for_dates[key] = value
     return res_dict_for_dates
 
