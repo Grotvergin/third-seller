@@ -3,12 +3,12 @@ from tariff.source import *
 
 def Main():
     sheet_id, token = GetSector('B8', 'C8', SERVICE, 'Сервисы', SHEET_ID)[0]
-    CleanSheet(len(COLUMNS_BOX), 'Коробы', ExtractSheetId(sheet_id), SERVICE)
-    CleanSheet(len(COLUMNS_MONO), 'Монопаллеты', ExtractSheetId(sheet_id), SERVICE)
+    row_box = len(GetSector('A2', 'A1000', SERVICE, 'Коробы', ExtractSheetId(sheet_id))) + 2
+    row_mono = len(GetSector('A2', 'A1000', SERVICE, 'Монопаллеты', ExtractSheetId(sheet_id))) + 2
     data_box = ProcessData(token, URL_BOX, COLUMNS_BOX)
     data_mono = ProcessData(token, URL_MONO, COLUMNS_MONO)
-    UploadData(data_box, 'Коробы', ExtractSheetId(sheet_id), SERVICE)
-    UploadData(data_mono, 'Монопаллеты', ExtractSheetId(sheet_id), SERVICE)
+    UploadData(data_box, 'Коробы', ExtractSheetId(sheet_id), SERVICE, row_box)
+    UploadData(data_mono, 'Монопаллеты', ExtractSheetId(sheet_id), SERVICE, row_mono)
 
 
 def ProcessData(token: str, url: str, columns: list) -> list:
