@@ -68,6 +68,7 @@ def Normalize(raw: list) -> list:
 def ProcessData(raw: list, sheet_name: str) -> list:
     num = 2
     list_of_rows = []
+    Stamp(f"LEN = {SmartLen(raw)}", 'w')
     for i in range(SmartLen(raw)):
         one_row = []
         for key, value in SHEETS[sheet_name]['Columns'].items():

@@ -4,7 +4,7 @@ from secret import *
 SECTOR = ('B2', 'C2')
 PERC_COMM = 0.022249
 SLEEP = 70
-DATE_FROM = (datetime.now() - timedelta(days=120)).strftime('%Y-%m-%d')
+DATE_FROM = (datetime.now() - timedelta(days=90)).strftime('%Y-%m-%d')
 
 SHEETS = {
     'Заказы': {
