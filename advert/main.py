@@ -65,7 +65,7 @@ def GetData(url: str, token:str, body: list = None) -> dict:
 
 
 def ProcessData(raw: dict, sheet_name: str, token: str, sheet_id: str, service: Resource) -> None:
-    row = len(GetSector('A2', 'A40000', service, sheet_name, sheet_id)) + 2
+    row = len(GetSector('A2', 'A100000', service, sheet_name, sheet_id)) + 2
     Stamp(f'For sheet {sheet_name} found {SmartLen(raw)} companies', 'i')
     for i in range(0, SmartLen(raw), PORTION):
         Stamp(f'Processing {PORTION} campaigns from {i} out of {SmartLen(raw)}', 'i')
